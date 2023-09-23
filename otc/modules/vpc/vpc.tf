@@ -9,68 +9,64 @@ resource "opentelekomcloud_vpc_v1" "vpc" {
   tags   = var.tags
 }
 
-##Subnets
+## Public Subnet ##
 
-##resource "opentelekomcloud_vpc_subnet_v1" "subnets" {
-##  for_each   = var.subnets
-##  name       = each.key
-##  vpc_id     = opentelekomcloud_vpc_v1.vpc.id
-##  cidr       = each.value != "" ? each.value : local.subnets_default_cidr[each.key]
-##  gateway_ip = cidrhost(each.value != "" ? each.value : local.subnets_default_cidr[each.key], 1)
-##  dns_list   = var.dns_config
-##  tags       = var.tags
-##}
-
-## Private Subnet
-
-resource "opentelekomcloud_vpc_subnet_v1" "private_subnet" {
-  name       = "${var.name}_private_subnet"
+resource "opentelekomcloud_vpc_subnet_v1" "private_subnet01" {
+  name       = "${var.name}_private_subnet_az01"
   vpc_id     = opentelekomcloud_vpc_v1.vpc.id
   cidr       = "${cidrsubnet(opentelekomcloud_vpc_v1.vpc.cidr, 8, 0)}"
-  #gateway_ip = cidrhost(var.cidr_block, 1)
   gateway_ip = cidrhost(cidrsubnet(opentelekomcloud_vpc_v1.vpc.cidr, 8, 0),1)
-  
+  availability_zone = var.availability_zone01
 }
 
-## Public Subnet
-
-resource "opentelekomcloud_vpc_subnet_v1" "public_subnet" {
-  name       = "${var.name}_public_subnet"
+resource "opentelekomcloud_vpc_subnet_v1" "private_subnet02" {
+  name       = "${var.name}_private_subnet_az02"
   vpc_id     = opentelekomcloud_vpc_v1.vpc.id
   cidr       = "${cidrsubnet(opentelekomcloud_vpc_v1.vpc.cidr, 8, 1)}"
-  #gateway_ip = cidrhost(var.cidr_block, 1)
   gateway_ip = cidrhost(cidrsubnet(opentelekomcloud_vpc_v1.vpc.cidr, 8, 1),1)
+  availability_zone = var.availability_zone02
 }
 
-## Nat gw
+resource "opentelekomcloud_vpc_subnet_v1" "private_subnet03" {
+  name       = "${var.name}_private_subnet_az03"
+  vpc_id     = opentelekomcloud_vpc_v1.vpc.id
+  cidr       = "${cidrsubnet(opentelekomcloud_vpc_v1.vpc.cidr, 8, 2)}"
+  gateway_ip = cidrhost(cidrsubnet(opentelekomcloud_vpc_v1.vpc.cidr, 8, 2),1)
+  availability_zone = var.availability_zone03
+}
 
-resource "opentelekomcloud_nat_gateway_v2" "nat_gw" {
-  name                = "${var.name}_nat_gw"
-  description         = "NAT GW"
+
+## Public Subnet ##
+
+resource "opentelekomcloud_vpc_subnet_v1" "public_subnet01" {
+  name       = "${var.name}_public_subnet_az01"
+  vpc_id     = opentelekomcloud_vpc_v1.vpc.id
+  cidr       = "${cidrsubnet(opentelekomcloud_vpc_v1.vpc.cidr, 8, 3)}"
+  gateway_ip = cidrhost(cidrsubnet(opentelekomcloud_vpc_v1.vpc.cidr, 8, 3),1)
+  availability_zone = var.availability_zone01
+}
+
+resource "opentelekomcloud_vpc_subnet_v1" "public_subnet02" {
+  name       = "${var.name}_public_subnet_az02"
+  vpc_id     = opentelekomcloud_vpc_v1.vpc.id
+  cidr       = "${cidrsubnet(opentelekomcloud_vpc_v1.vpc.cidr, 8, 4)}"
+  gateway_ip = cidrhost(cidrsubnet(opentelekomcloud_vpc_v1.vpc.cidr, 8, 4),1)
+  availability_zone = var.availability_zone02
+}
+
+resource "opentelekomcloud_vpc_subnet_v1" "public_subnet03" {
+  name       = "${var.name}_public_subnet_az03"
+  vpc_id     = opentelekomcloud_vpc_v1.vpc.id
+  cidr       = "${cidrsubnet(opentelekomcloud_vpc_v1.vpc.cidr, 8, 5)}"
+  gateway_ip = cidrhost(cidrsubnet(opentelekomcloud_vpc_v1.vpc.cidr, 8, 5),1)
+  availability_zone = var.availability_zone03
+}
+
+## NAT Gateway
+
+resource "opentelekomcloud_nat_gateway_v2" "nat_gw_az01" {
+  name                = "${var.name}_natgw_az01"
   spec                = "1"
   router_id           = opentelekomcloud_vpc_v1.vpc.id
-  internal_network_id = opentelekomcloud_vpc_subnet_v1.public_subnet.id
-
+  internal_network_id = opentelekomcloud_vpc_subnet_v1.public_subnet01.id
 }
-## EIP for SNAT
-
-resource "opentelekomcloud_networking_floatingip_v2" "snat_public_ip" {
-}
-
-
-## SNAT Rules
-
-resource "opentelekomcloud_nat_snat_rule_v2" "nc_snat_public" {
-  nat_gateway_id = opentelekomcloud_nat_gateway_v2.nat_gw.id
-  floating_ip_id = opentelekomcloud_networking_floatingip_v2.snat_public_ip.id
-  network_id     = opentelekomcloud_vpc_subnet_v1.public_subnet.id
-  source_type    = 0
-}
-
-##resource "opentelekomcloud_nat_snat_rule_v2" "nc_snat_private" {
-##  nat_gateway_id = opentelekomcloud_nat_gateway_v2.nc_nat.id
-##  floating_ip_id = opentelekomcloud_networking_floatingip_v2.snat_public_ip.id
-##  network_id     = opentelekomcloud_vpc_subnet_v1.private.id
-##  source_type    = 0
-##}
-

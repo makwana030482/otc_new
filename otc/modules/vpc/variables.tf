@@ -17,23 +17,23 @@ variable "cidr_block" {
   default     = "10.0.0.0/16"
 }
 
-#variable "subnets" {
-#  type        = map(string)
-#  description = "Subnet names and their cidr ranges."
-#  default = {
-#    "private-subnet1" = ""
-#    "private-subnet2" = ""
-#    "public-subnet"   = ""
-#   }
-#}
+variable "availability_zone01" {
+  type        = string
+  description = "AZ 01"
+  default     = "eu-de-01"
+}
 
-#locals {
-#  subnets_default_cidr = {                                 // divide network range to 8 parcels
-#    "private-subnet1" = cidrsubnet(var.cidr_block, 2, 0) // first and second parcel
-#    "private-subnet2" = cidrsubnet(var.cidr_block, 3, 2) // third parcel
-#    "public-subnet"   = cidrsubnet(var.cidr_block, 3, 3) // fourth parcel
-#  }                                                        // half of network range is left available for future expansion
-#}
+variable "availability_zone02" {
+  type        = string
+  description = "AZ 02"
+  default     = "eu-de-02"
+}
+
+variable "availability_zone03" {
+  type        = string
+  description = "AZ 03"
+  default     = "eu-de-03"
+}
 
 variable "dns_config" {
   type        = list(string)
@@ -55,4 +55,3 @@ variable "region" {
   description = "(default: eu-de)"
   default     = "eu-de"
 }
-
