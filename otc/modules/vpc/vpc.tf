@@ -9,7 +9,7 @@ resource "opentelekomcloud_vpc_v1" "vpc" {
   tags   = var.tags
 }
 
-## Public Subnet ##
+## Private Subnet ##
 
 resource "opentelekomcloud_vpc_subnet_v1" "private_subnet01" {
   name       = "${var.name}_private_subnet_az01"
@@ -64,9 +64,9 @@ resource "opentelekomcloud_vpc_subnet_v1" "public_subnet03" {
 
 ## NAT Gateway
 
-resource "opentelekomcloud_nat_gateway_v2" "nat_gw_az01" {
-  name                = "${var.name}_natgw_az01"
-  spec                = "1"
-  router_id           = opentelekomcloud_vpc_v1.vpc.id
-  internal_network_id = opentelekomcloud_vpc_subnet_v1.public_subnet01.id
-}
+#resource "opentelekomcloud_nat_gateway_v2" "nat_gw_az01" {
+#  name                = "${var.name}_natgw_az01"
+#  spec                = "1"
+#  router_id           = opentelekomcloud_vpc_v1.vpc.id
+#  internal_network_id = opentelekomcloud_vpc_subnet_v1.public_subnet01.id
+#}
