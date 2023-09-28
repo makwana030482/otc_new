@@ -61,7 +61,7 @@ resource "opentelekomcloud_compute_instance_v2" "jump_host" {
   image_id          = data.opentelekomcloud_images_image_v2.ecs_vm_image.id
   flavor_id         = var.flavor_id
   key_pair          = var.key_name
-  security_groups  = [opentelekomcloud_networking_secgroup_v2.jh_ssh_ecs_vm_sg.name]
+  security_groups  = [opentelekomcloud_networking_secgroup_v2.jh_ssh_ecs_vm_sg.id]
   availability_zone = var.availability_zone
   network {
     uuid = var.public_subnet01
@@ -88,3 +88,20 @@ resource "opentelekomcloud_networking_floatingip_associate_v2" "jumphost_eip_ass
   floating_ip = opentelekomcloud_vpc_eip_v1.jumphost_eip.publicip[0].ip_address
   port_id     = opentelekomcloud_compute_instance_v2.jump_host.network[0].port
 }
+
+####tesing ssh keys
+
+
+#resource "tls_private_key" "ssh_key" {
+#  algorithm = "RSA"
+#  rsa_bits = 4096
+#}
+
+#resource "remote_file" "ssh_public_key" {
+#  source = file("${path.module}/id_rsa.pub")
+#  destination = "/home/user/.ssh/authorized_keys"
+#  server_address = var.dynatrace_node1_private_address
+#  user = "user"
+#  private_key = tls_private_key.ssh_key.private_key_pem
+#}
+

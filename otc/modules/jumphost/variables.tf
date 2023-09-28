@@ -61,3 +61,7 @@ variable "access_constraint" {
 variable "public_subnet01" {
   type        = string
 }
+
+#variable "dynatrace_node1_private_address" {
+#  type        = string
+#}
