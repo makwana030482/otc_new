@@ -18,18 +18,28 @@ resource "opentelekomcloud_networking_secgroup_rule_v2" "dynatrace_ssh_ecs_vm_sg
   protocol          = "tcp"
   port_range_min    = var.ssh_port
   port_range_max    = var.ssh_port
-  remote_ip_prefix  = var.access_constraint
+  #remote_ip_prefix  = var.access_constraint
+  remote_ip_prefix  = var.access_constraint_ecs
   security_group_id = opentelekomcloud_networking_secgroup_v2.dynatrce_node_ssh_ecs_vm_sg.id
 }
 
-resource "opentelekomcloud_networking_secgroup_rule_v2" "dynatrace_ssh_ecs_vm_sg_out_rule" {
-  direction         = "egress"
-  ethertype         = "IPv4"
-  protocol          = "tcp"
-  port_range_min    = var.ssh_port
-  port_range_max    = var.ssh_port
-  remote_ip_prefix  = var.access_constraint
-  security_group_id = opentelekomcloud_networking_secgroup_v2.dynatrce_node_ssh_ecs_vm_sg.id
+#resource "opentelekomcloud_networking_secgroup_rule_v2" "dynatrace_ssh_ecs_vm_sg_out_rule" {
+#  direction         = "egress"
+#  ethertype         = "IPv4"
+#  protocol          = "tcp"
+#  port_range_min    = var.ssh_port
+#  port_range_max    = var.ssh_port
+#  remote_ip_prefix  = var.access_constraint
+#  security_group_id = opentelekomcloud_networking_secgroup_v2.dynatrce_node_ssh_ecs_vm_sg.id
+#}
+
+## Creating 4 volumes for Dynatrace node1
+
+resource "opentelekomcloud_blockstorage_volume_v2" "volumes" {
+  count = 4
+  name  = format("vol-%02d", count.index + 1)
+  availability_zone = var.availability_zone
+  size  = 1
 }
 
 data "opentelekomcloud_images_image_v2" "ecs_vm_image" {
@@ -63,3 +73,10 @@ resource "opentelekomcloud_compute_instance_v2" "dynatrace_node1" {
               EOF
 }
 
+## Attaching Volumes to Dynatrace Nodes 
+
+resource "opentelekomcloud_compute_volume_attach_v2" "attachments" {
+  count       = 4
+  instance_id = opentelekomcloud_compute_instance_v2.dynatrace_node1.id
+  volume_id   = opentelekomcloud_blockstorage_volume_v2.volumes[count.index].id
+}

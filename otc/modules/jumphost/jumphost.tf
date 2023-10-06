@@ -89,19 +89,25 @@ resource "opentelekomcloud_networking_floatingip_associate_v2" "jumphost_eip_ass
   port_id     = opentelekomcloud_compute_instance_v2.jump_host.network[0].port
 }
 
-####tesing ssh keys
+## Test for login
+resource "null_resource" "configure_ssh" {
+  provisioner "remote-exec" {
+  inline = [
+    "sudo apt-get update",
+    "sudo apt-get install -y openssh-client",
+    "ssh-keygen -t rsa -b 2048 -f ~/.ssh/id_rsa -N ''",
+    "ssh-copy-id -i ~/.ssh/id_rsa ubuntu@${var.dynatrace_node1_private_address} > /tmp/ssh_copy_id.log 2>&1"  # Replace 'user' and 'VM_IP_ADDRESS' accordingly
+  ]
+#  connection {
+#  #  # ... Connection configuration
+#  }
+}  
 
-
-#resource "tls_private_key" "ssh_key" {
-#  algorithm = "RSA"
-#  rsa_bits = 4096
-#}
-
-#resource "remote_file" "ssh_public_key" {
-#  source = file("${path.module}/id_rsa.pub")
-#  destination = "/home/user/.ssh/authorized_keys"
-#  server_address = var.dynatrace_node1_private_address
-#  user = "user"
-#  private_key = tls_private_key.ssh_key.private_key_pem
-#}
-
+  connection {
+    type        = "ssh"
+    user        = "ubuntu"
+    private_key = file("~/.ssh/id_rsa")
+    #host        = opentelekomcloud_compute_instance_v2.jump_host.access_ip_v4 # Assumes network configuration provides the IP of Jumphost
+    host        = opentelekomcloud_vpc_eip_v1.jumphost_eip.publicip[0].ip_address
+  }
+}

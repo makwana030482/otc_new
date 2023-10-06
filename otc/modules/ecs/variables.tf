@@ -52,11 +52,16 @@ variable "ssh_port" {
   default     = "22"
 }
 
-variable "access_constraint" {
+variable "access_constraint_ecs" {
   description = "CIDR block for security group rule"
   type        = string
-  default     = "0.0.0.0/0" 
 }
+
+#variable "access_constraint" {
+#  description = "CIDR block for security group rule"
+#  type        = string
+#  default     = "0.0.0.0/0" 
+#}
 
 variable "private_subnet01" {
   type        = string
