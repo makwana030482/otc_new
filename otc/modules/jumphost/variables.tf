@@ -10,10 +10,22 @@ variable "region" {
   default     = "eu-de"
 }
 
-variable "availability_zone" {
+variable "availability_zone1" {
   type        = string
   description = "choose from eu-de-01, eu-de-02, eu-de-03 default: eu-de-01)"
   default     = "eu-de-01"
+}
+
+variable "availability_zone2" {
+  type        = string
+  description = "choose from eu-de-01, eu-de-02, eu-de-03 default: eu-de-01)"
+  default     = "eu-de-02"
+}
+
+variable "availability_zone3" {
+  type        = string
+  description = "choose from eu-de-01, eu-de-02, eu-de-03 default: eu-de-01)"
+  default     = "eu-de-03"
 }
 
 variable "node_storage_type" {
@@ -26,6 +38,12 @@ variable "flavor_id" {
   type        = string
   description = "Jumphost node specifications in otc flavor format. (default: s3.medium.2 (3rd generation 1 Core 2GB RAM))"
   default     = "s3.medium.1"
+}
+
+variable "flavor_id_node" {
+  type        = string
+  description = "Jumphost node specifications in otc flavor format. (default: s3.medium.2 (3rd generation 1 Core 2GB RAM))"
+  default     = "s3.xlarge.8"
 }
 
 variable "key_name" {

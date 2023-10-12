@@ -62,24 +62,10 @@ resource "opentelekomcloud_compute_instance_v2" "jump_host" {
   flavor_id         = var.flavor_id
   key_pair          = var.key_name
   security_groups  = [opentelekomcloud_networking_secgroup_v2.jh_ssh_ecs_vm_sg.id]
-  availability_zone = var.availability_zone
+  availability_zone = var.availability_zone1
   network {
     uuid = var.public_subnet01
   }
-
-  user_data = <<-EOF
-              #!/bin/bash
-              echo "Running user-initiated script"
-              sudo apt-get update
-              sudo apt-get install -y ansible
-              sudo adduser --disabled-password --gecos "" cao
-              echo 'cao ALL=(ALL) NOPASSWD:ALL' | sudo tee -a /etc/sudoers
-              sudo mkdir /home/cao/.ssh
-              echo '${var.key_file}' > /home/cao/.ssh/authorized_keys
-              sudo chown -R prayag:cao /home/prayag/.ssh
-              sudo chmod 700 /home/cao/.ssh
-              sudo chmod 600 /home/cao/.ssh/authorized_keys
-              EOF
 }
 
 ## Assigning eip to jumphost
@@ -87,27 +73,4 @@ resource "opentelekomcloud_compute_instance_v2" "jump_host" {
 resource "opentelekomcloud_networking_floatingip_associate_v2" "jumphost_eip_association" {
   floating_ip = opentelekomcloud_vpc_eip_v1.jumphost_eip.publicip[0].ip_address
   port_id     = opentelekomcloud_compute_instance_v2.jump_host.network[0].port
-}
-
-## Test for login
-resource "null_resource" "configure_ssh" {
-  provisioner "remote-exec" {
-  inline = [
-    "sudo apt-get update",
-    "sudo apt-get install -y openssh-client",
-    "ssh-keygen -t rsa -b 2048 -f ~/.ssh/id_rsa -N ''",
-    "ssh-copy-id -i ~/.ssh/id_rsa ubuntu@${var.dynatrace_node1_private_address} > /tmp/ssh_copy_id.log 2>&1"  # Replace 'user' and 'VM_IP_ADDRESS' accordingly
-  ]
-#  connection {
-#  #  # ... Connection configuration
-#  }
-}  
-
-  connection {
-    type        = "ssh"
-    user        = "ubuntu"
-    private_key = file("~/.ssh/id_rsa")
-    #host        = opentelekomcloud_compute_instance_v2.jump_host.access_ip_v4 # Assumes network configuration provides the IP of Jumphost
-    host        = opentelekomcloud_vpc_eip_v1.jumphost_eip.publicip[0].ip_address
-  }
 }

@@ -66,11 +66,24 @@ variable "node_storage_type" {
   default     = "SAS"
 }
 
+variable "flavor_id_cag" {
+  type        = string
+  description = "Jumphost node specifications in otc flavor format. (default: s3.medium.2 (3rd generation 1 Core 2GB RAM))"
+  default     = "s3.large.2"
+}
+
+variable "flavor_id_node" {
+  type        = string
+  description = "Jumphost node specifications in otc flavor format. (default: s3.medium.2 (3rd generation 1 Core 2GB RAM))"
+  default     = "s3.xlarge.8"
+}
+
 variable "flavor_id" {
   type        = string
   description = "Jumphost node specifications in otc flavor format. (default: s3.medium.2 (3rd generation 1 Core 2GB RAM))"
   default     = "s3.medium.1"
 }
+
 
 variable "key_name" {
   type        = string
